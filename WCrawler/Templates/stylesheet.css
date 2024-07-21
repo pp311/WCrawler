@@ -1,0 +1,66 @@
+.author {
+  display: block;
+  font-size: 1.125em;
+  font-weight: bold;
+  line-height: 1.2;
+  margin: 1em 0;
+}
+.calibre {
+  display: block;
+  font-family: "Bookerly", serif;
+  font-size: 1em;
+  line-height: 1.2;
+  padding-left: 0;
+  padding-right: 0;
+  margin: 0 5pt;
+}
+.calibre1 {
+  display: block;
+}
+.calibre2 {
+  font-family: monospace;
+}
+.calibre3 {
+  display: block;
+  list-style-type: disc;
+  margin-bottom: 1em;
+  margin-right: 0;
+  margin-top: 1em;
+}
+.calibre4 {
+  display: block;
+  margin: 1em 0;
+}
+.calibre5 {
+  font-style: italic;
+}
+.calibre6 {
+  font-weight: bold;
+}
+.chaptertype {
+  display: list-item;
+}
+.publisher {
+  display: block;
+  font-weight: bold;
+  margin: 1.33em 0;
+}
+.subtitle {
+  display: block;
+  font-size: 1.375em;
+  font-weight: bold;
+  line-height: 1.2;
+  margin: 0.83em 0;
+}
+.title {
+  display: block;
+  font-size: 1.5em;
+  font-weight: bold;
+  line-height: 1.2;
+  margin: 0.67em 0;
+}
+.visible-md {
+  display: block;
+  height: 90px;
+  text-align: center;
+}

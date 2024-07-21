@@ -1,0 +1,10 @@
+folder/
+    META-INF/
+        container.xml
+    mimetype
+    OEBPS/
+        content.opf
+        images
+        text
+        music
+        css

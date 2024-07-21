@@ -1,0 +1,17 @@
+{
+  "address":"",
+  "chapterUrl":"/muc-luc?page=all",
+  "chapterStartPageIndex": 1,
+  "baseUrl": "https://bachngocsach.com.vn",
+  "allChapterLink":"",
+  "titleSelector":"#truyen-title",
+  "getChapterType": 2,
+  "coverSelector":"#anhbia > img",
+  "authorNameSelector":"#tacgia > a",
+  "statusSelector":".text-success",
+  "descriptionSelector":"#gioithieu > div",
+  "chapterListSelector":".chuong-item",
+  "chapterTitleSelector":".chuong-name",
+  "chapterUrlSelector":".chuong-link",
+  "chapterContentSelector":"#noi-dung"
+}

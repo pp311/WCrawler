@@ -1,0 +1,34 @@
+<?xml version="1.0"  encoding="UTF-8"?>
+<package xmlns="http://www.idpf.org/2007/opf" version="2.0" unique-identifier="uuid_id">
+  <metadata xmlns:opf="http://www.idpf.org/2007/opf" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:calibre="http://calibre.kovidgoyal.net/2009/metadata">
+    <dc:title>{{Title}}</dc:title>
+    <dc:creator opf:role="aut">{{Author}}</dc:creator>
+    <dc:date>{{Date}}</dc:date>
+    <dc:language>{{Lang}}</dc:language>
+    <dc:identifier id="bookid">urn:uuid:{{Guid}}</dc:identifier>
+    <meta name="cover" content="cover"/>
+  </metadata>
+  <manifest>
+    <item id="titlepage" href="titlepage.xhtml" media-type="application/xhtml+xml"/>
+    <item id="title-page" href="OEBPS/title-page.html" media-type="application/xhtml+xml"/>
+    <item id="table-of-contents" href="OEBPS/table-of-contents.html" media-type="application/xhtml+xml"/>
+    {{Item}}
+  
+    <item id="ncx" href="toc.ncx" media-type="application/x-dtbncx+xml"/>
+    <item id="page_css" href="page_styles.css" media-type="text/css"/>
+    <item id="css" href="stylesheet.css" media-type="text/css"/>
+    <item id="cover" href="cover.jpeg" media-type="image/jpeg"/>
+    <item id="font" href="fonts/Bookerly.ttf" media-type="application/x-font-truetype"/>
+  </manifest>
+  <spine toc="ncx">
+    <itemref idref="titlepage"/>
+    <itemref idref="title-page"/>
+    <itemref idref="table-of-contents"/>
+    {{ItemRef}}
+   
+  </spine>
+  <guide>
+    <reference type="toc" href="OEBPS/table-of-contents.html" title="Table of Contents"/>
+    <reference type="cover" href="titlepage.xhtml" title="Cover"/>
+  </guide>
+</package>

@@ -1,0 +1,15 @@
+{
+  "address":"",
+  "chapterUrl":"/trang-{0}/#list-chapter",
+  "chapterStartPageIndex": 1,
+  "titleSelector":".title",
+  "coverSelector":".book > img",
+  "getChapterType": 1,
+  "authorNameSelector":"a[itemprop=\"author\"]",
+  "statusSelector":".text-success",
+  "descriptionSelector":"div[itemprop=\"description\"]",
+  "chapterListSelector":".list-chapter > li",
+  "chapterTitleSelector":":scope > a",
+  "chapterUrlSelector":":scope > a",
+  "chapterContentSelector":"#chapter-c"
+}
