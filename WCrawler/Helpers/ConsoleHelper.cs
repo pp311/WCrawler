@@ -10,29 +10,24 @@ namespace WCrawler.Helpers;
 public static class ConsoleHelper
 {
     public static Eff<MainMenuAction> GetMainMenuAction()
-    {
-        return Eff(() => AnsiConsole.Prompt(
+        => Eff(() => AnsiConsole.Prompt(
             new SelectionPrompt<MainMenuAction>()
                 .Title("\nChoose an action:")
                 .PageSize(10)
                 .UseConverter(action => action.ToValue())
                 .AddChoices(Enum.GetValues<MainMenuAction>())
         ));
-    }
     
     public static Eff<SourceType> GetCrawlSourceType()
-    {
-        return Eff(() => AnsiConsole.Prompt(
+        => Eff(() => AnsiConsole.Prompt(
             new SelectionPrompt<SourceType>()
                 .PageSize(10)
                 .UseConverter(sourceType => sourceType.ToValue())
                 .AddChoices(Enum.GetValues<SourceType>())
         ));
-    }
     
     public static Eff<(SourceType SourceType, string Url)> PromptCrawlUrl(SourceType sourceType)
-    {
-        return Eff(() => AnsiConsole.Ask<string>($"Enter the URL of {sourceType.ToValue()}:"))
+        => Eff(() => AnsiConsole.Ask<string>($"Enter the URL of {sourceType.ToValue()}:"))
             .Map(url =>
             {
                 if (!url.Contains(sourceType.ToValue()))
@@ -41,7 +36,6 @@ public static class ConsoleHelper
                 return (sourceType, url.TrimEnd('/'));
             })
             .IfFail(e => (sourceType, WriteError(e).ToString()[..0]));
-    }
 
     public static Eff<string> PromptCrawlResult()
         => Eff(() => AnsiConsole.Prompt(
@@ -57,19 +51,17 @@ public static class ConsoleHelper
         ));
     
     public static Eff<Unit> PrintSettingTable()
-    { 
-        return Eff(() =>
+        => Eff(() =>
         {
             AnsiConsole.Write(
                 new Table()
                     .Title("Setting")
                     .Border(new SquareTableBorder())
-                    .AddColumns(["Name", "Value"])
-                    .AddRow(["Export directory", AppSetting.ExportDir])
+                    .AddColumns("Name", "Value")
+                    .AddRow("Export directory", AppSetting.ExportDir)
             );
             return Unit.Default;
         });
-    }
     
     public static SettingAction PromptSettingAction()
     {
@@ -83,8 +75,7 @@ public static class ConsoleHelper
     }
     
     public static Aff<Unit> HandleSettingAction(SettingAction action)
-    {
-        return action switch
+        => action switch
         {
             SettingAction.EditExportDir => Eff(() =>  AnsiConsole.Ask<string>("Enter the new export directory:"))
                 .Map(Path.GetFullPath)
@@ -92,7 +83,6 @@ public static class ConsoleHelper
             SettingAction.Back => Eff(() => unit),
             _ => throw new ArgumentOutOfRangeException(nameof(action), action, null)
         };
-    }
     
     public static Unit WriteError(Error error)
     {
@@ -101,11 +91,8 @@ public static class ConsoleHelper
     }
     
     public static Unit WriteLine(string value, Color color = default)
-    {
-        AnsiConsole.MarkupLine($"[{color}] {value} [/]");
-        return unit;
-    }
-    
+        => act(() => AnsiConsole.MarkupLine($"[{color}] {value} [/]")).ReturnUnit();
+
     public static Unit Exit()
     {
         Environment.Exit(0);

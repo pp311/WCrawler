@@ -15,58 +15,52 @@ public static class EpubHelper
         CommonHelper.CreateDir($"{bookDir}/fonts");
         CommonHelper.CreateDir($"{bookDir}/META-INF");
         CommonHelper.CreateDir($"{bookDir}/OEBPS");
-        
-        return Aff(() => CreateMimeTypeFileAsync(bookDir).ToUnit().ToValue())
-            .Bind(_ => SaveCoverAsync(book.Cover, bookDir))
-            .Map(_ => CopyContainerXml(bookDir))
-            .Map(_ => CopyStyleSheets(bookDir))
-            .Map(_ => CopyFonts(bookDir))
-            .Map(_ => CopyTitlePage(bookDir))
-            .Bind(_ => CreateContentOpfAsync(book, bookDir))
-            .Bind(_ => CreateTocNcxAsync(book, bookDir))
-            .Bind(_ => CreateTableOfContentHtmlAsync(book, bookDir))
-            .Bind(_ => CreateTitlePageAsync(book, bookDir))
-            .Bind(_ => CreateChapterPagesAsync(book, bookDir))
-            .Map(_ => ZipToEpubAsync(bookDir, book.Title))
-            .Map(_ => RemoveDir(bookDir));
+
+        return Aff(async () =>
+        {
+            await Task.WhenAll(
+                CreateMimeTypeFileAsync(bookDir),
+                SaveCoverAsync(book.Cover, bookDir),
+                new Task(() => CopyContainerXml(bookDir)),
+                new Task(() => CopyFonts(bookDir)),
+                new Task(() => CopyStyleSheets(bookDir)),
+                new Task(() => CopyTitlePage(bookDir)),
+                CreateContentOpfAsync(book, bookDir),
+                CreateTocNcxAsync(book, bookDir),
+                CreateTableOfContentHtmlAsync(book, bookDir),
+                CreateTitlePageAsync(book, bookDir),
+                CreateChapterPagesAsync(book, bookDir));
+
+            ZipToEpubAsync(bookDir, book.Title);
+            RemoveDir(bookDir);
+
+            return Unit.Default;
+        });
     }
 
-    private static Aff<Unit> SaveCoverAsync(string? coverUrl, string bookDir)
-    {
-        if (bookDir.IsBlank())
-            return new Aff<Unit>();
-            
-        return Aff(async () => await use(File.Create($"{bookDir}/cover.jpeg"), 
-            async file =>
-            {
-                await (await new HttpClient().GetStreamAsync(coverUrl)).CopyToAsync(file);
-                return unit;
-            }));
-    }
+    private static Task SaveCoverAsync(string? coverUrl, string bookDir)
+        => bookDir.IsBlank()
+            ? Task.CompletedTask
+            : use(File.Create($"{bookDir}/cover.jpeg"), async file => await (await new HttpClient().GetStreamAsync(coverUrl)).CopyToAsync(file));
 
     private static async Task CreateMimeTypeFileAsync(string bookDir)
         => await File.WriteAllTextAsync($"{bookDir}/mimetype", "application/epub+zip");
 
-    private static Unit CopyContainerXml(string bookDir)
-    {
-        File.Copy($"{AppSetting.TemplateDir}/container.xml", $"{bookDir}/META-INF/container.xml", true);
-        return default;
-    }
+    private static void CopyContainerXml(string bookDir)
+        => File.Copy($"{AppSetting.TemplateDir}/container.xml", $"{bookDir}/META-INF/container.xml", true);
 
-    private static Unit CopyStyleSheets(string bookDir)
+    private static void CopyStyleSheets(string bookDir)
     {
         File.Copy($"{AppSetting.TemplateDir}/stylesheet.css", $"{bookDir}/stylesheet.css", true);
         File.Copy($"{AppSetting.TemplateDir}/page_styles.css", $"{bookDir}/page_styles.css", true);
-        return default;
     }
 
-    private static Unit CopyFonts(string bookDir)
+    private static void CopyFonts(string bookDir)
     {
         File.Copy($"{AppSetting.TemplateDir}/fonts/Bookerly.ttf", $"{bookDir}/fonts/Bookerly.ttf", true);
-        return default;
     }
 
-    private static Aff<Unit> CreateContentOpfAsync(Book book, string bookDir)
+    private static Task CreateContentOpfAsync(Book book, string bookDir)
         => Aff(() => File.ReadAllTextAsync($"{AppSetting.TemplateDir}/content.opf").ToValue())
             .Map(contentOpf => contentOpf
                 .Replace("{{Title}}", book.Title)
@@ -80,9 +74,11 @@ public static class EpubHelper
                 .Replace("{{ItemRef}}", string.Join("\n\t", book.Chapters //<itemref idref="page-0"/>
                     .Select(c => 
                         $"<itemref idref=\"page-{c.Index}\"/>"))))
-            .MapAsync(contentOpf => File.WriteAllTextAsync($"{bookDir}/content.opf", contentOpf).ToUnit().ToValue());
+            .MapAsync(contentOpf => File.WriteAllTextAsync($"{bookDir}/content.opf", contentOpf).ToUnit().ToValue())
+            .RunUnit()
+            .AsTask();
 
-    private static Aff<Unit> CreateTocNcxAsync(Book book, string bookDir)
+    private static Task CreateTocNcxAsync(Book book, string bookDir)
     {
         var startPlayOrder = 3;
         
@@ -93,31 +89,35 @@ public static class EpubHelper
                         $"<navPoint id=\"page-{c.Index}\" playOrder=\"{startPlayOrder++}\" class=\"chapter\"><navLabel><text>{c.Title}</text></navLabel><content src=\"OEBPS/page-{c.Index}.html\"/></navPoint>")))
                 .Replace("{{Title}}", book.Title)
                 .Replace("{{Guid}}", Guid.NewGuid().ToString()))
-            .MapAsync(tocNcx => File.WriteAllTextAsync($"{bookDir}/toc.ncx", tocNcx).ToUnit().ToValue());
+            .MapAsync(tocNcx => File.WriteAllTextAsync($"{bookDir}/toc.ncx", tocNcx).ToUnit().ToValue())
+            .RunUnit()
+            .AsTask();
     }
 
-    private static Aff<Unit> CreateTableOfContentHtmlAsync(Book book, string bookDir)
+    private static Task CreateTableOfContentHtmlAsync(Book book, string bookDir)
         => Aff(() => File.ReadAllTextAsync($"{AppSetting.TemplateDir}/table-of-contents.html").ToValue())
             .Map(tocHtml => tocHtml.Replace("{{TOC}}", string.Join("\n\t\t\t", book.Chapters
                 .Select(c => 
                     $"<li><a href=\"page-{c.Index}.html\"><span>{c.Title}</span></a></li>"))))
-            .MapAsync(tocHtml => File.WriteAllTextAsync($"{bookDir}/OEBPS/table-of-contents.html", tocHtml).ToUnit().ToValue());
+            .MapAsync(tocHtml => File.WriteAllTextAsync($"{bookDir}/OEBPS/table-of-contents.html", tocHtml).ToUnit().ToValue())
+            .RunUnit()
+            .AsTask();
 
-    private static Unit CopyTitlePage(string bookDir)
-    {
-        File.Copy($"{AppSetting.TemplateDir}/titlepage.xhtml", $"{bookDir}/titlepage.xhtml", true);
-        return default;
-    }
+    private static void CopyTitlePage(string bookDir)
+        => File.Copy($"{AppSetting.TemplateDir}/titlepage.xhtml", $"{bookDir}/titlepage.xhtml", true);
 
-    private static Aff<Unit> CreateTitlePageAsync(Book book, string bookDir)
+
+    private static Task CreateTitlePageAsync(Book book, string bookDir)
         => Aff(() => File.ReadAllTextAsync($"{AppSetting.TemplateDir}/title-page.html").ToValue())
             .Map(titlePage => titlePage
                 .Replace("{{Title}}", book.Title)
                 .Replace("{{AuthorName}}", book.AuthorName)
                 .Replace("{{Description}}", book.Description))
-            .MapAsync(titlePage => File.WriteAllTextAsync($"{bookDir}/OEBPS/title-page.html", titlePage).ToUnit().ToValue());
+            .MapAsync(titlePage => File.WriteAllTextAsync($"{bookDir}/OEBPS/title-page.html", titlePage).ToUnit().ToValue())
+            .RunUnit()
+            .AsTask();
 
-    private static Aff<Unit> CreateChapterPagesAsync(Book book, string bookDir)
+    private static Task CreateChapterPagesAsync(Book book, string bookDir)
         => Aff(() => File.ReadAllTextAsync($"{AppSetting.TemplateDir}/page.html").ToValue())
             .Map(template => book.Chapters
                 .Select(chapter =>
@@ -128,21 +128,18 @@ public static class EpubHelper
                             chapter.Content?.Replace("\n\n", "\n").Replace("\n", "<br><br>"));
                     return File.WriteAllTextAsync($"{bookDir}/OEBPS/page-{chapter.Index}.html", chapterPage);
                 }))
-            .MapAsync(tasks => Task.WhenAll(tasks).ToUnit().ToValue());
+            .MapAsync(tasks => Task.WhenAll(tasks).ToUnit().ToValue())
+            .RunUnit()
+            .AsTask();
 
-    private static Unit ZipToEpubAsync(string bookDir, string bookName)
+    private static void ZipToEpubAsync(string bookDir, string bookName)
     {
         var epubPath = $"{AppSetting.BookDir}/{bookName}.epub";
         if (File.Exists(epubPath))
             File.Delete(epubPath);
         
         ZipFile.CreateFromDirectory(bookDir, epubPath, CompressionLevel.NoCompression, false);
-        return default;
     }
     
-    private static Unit RemoveDir(string bookDir)
-    {
-        Directory.Delete(bookDir, true);
-        return default;
-    }
+    private static void RemoveDir(string bookDir) => Directory.Delete(bookDir, true);
 }

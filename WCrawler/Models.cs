@@ -6,10 +6,8 @@ public class Source
     public string BaseUrl { get; set; }
     public string ChapterUrl { get; set; }
     public string GetChapterUrl => $"{Address}{ChapterUrl}";
-    public bool IsChapterLinkFromApi { get; set; }
     public GetChapterType GetChapterType { get; set; }
     public int ChapterStartPageIndex { get; set; }
-    public string AllChapterLink { get; set; }
     public string TitleSelector { get; set; }
     public string CoverSelector { get; set; }
     public string AuthorNameSelector { get; set; }

@@ -38,4 +38,10 @@ public static class CommonExtensions {
     public static Option<T> ToOption<T>(this T obj) {
         return obj == null ? Option<T>.None : Option<T>.Some(obj);
     }
+
+    public static Unit ReturnUnit(this Action action)
+    {
+        action();
+        return Unit.Default;
+    }
 }
