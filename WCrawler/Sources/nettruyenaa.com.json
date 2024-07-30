@@ -1,0 +1,18 @@
+{
+  "address":"https://nettruyenaa.com/truyen-tranh/vo-dich-don-ngo-13810",
+  "chapterUrl":"",
+  "chapterStartPageIndex": 1,
+  "baseUrl": "",
+  "allChapterLink":"",
+  "titleSelector":".title-detail",
+  "getChapterType": 2,
+  "bookType": 2,
+  "coverSelector":".col-image > img",
+  "authorNameSelector":".author > .col-xs-8",
+  "statusSelector":".text-success",
+  "descriptionSelector":".detail-content",
+  "chapterListSelector":".chapter",
+  "chapterTitleSelector":"",
+  "chapterUrlSelector":"a",
+  "chapterContentSelector":".page-chapter > img"
+}

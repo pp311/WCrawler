@@ -1,3 +1,5 @@
+using Microsoft.VisualBasic.CompilerServices;
+
 namespace WCrawler;
 
 public class Source
@@ -8,10 +10,11 @@ public class Source
     public string GetChapterUrl => $"{Address}{ChapterUrl}";
     public GetChapterType GetChapterType { get; set; }
     public int ChapterStartPageIndex { get; set; }
+    public BookType BookType { get; set; }
     public string TitleSelector { get; set; }
     public string CoverSelector { get; set; }
     public string AuthorNameSelector { get; set; }
-    public string StatusSelector { get; set; }
+//    public string StatusSelector { get; set; }
     public string DescriptionSelector { get; set; }
     public string ChapterListSelector { get; set; }
     public string ChapterTitleSelector { get; set; }
@@ -24,8 +27,9 @@ public class Book
     public string Title { get; set; } = null!;
     public string? Cover { get; set; }
     public string? AuthorName { get; set; }
-    public string? Status { get; set; }
+//    public string? Status { get; set; }
     public string? Description { get; set; }
+    public BookType BookType { get; set; }
 
     public List<Chapter> Chapters { get; set; } = [];
 }

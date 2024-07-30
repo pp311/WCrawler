@@ -1,5 +1,4 @@
 using Dasync.Collections;
-using Spectre.Console;
 using static LanguageExt.Prelude;
 using static WCrawler.Helpers.CrawlHelper;
 
@@ -24,15 +23,27 @@ public static class CrawlExtensions
             if (chapter.Url.IsBlank())
                 return;
             
-            Optional(await GetDocumentAsync(chapter.Url))
-                .Map(document => document.QuerySelector(source.ChapterContentSelector)?.TextContent)
-                .BiIter(
-                    Some: content =>
-                    {
-                        chapter.Content = content;
-                        chapter.WordCount = content?.Split(" ").Length ?? 0;
-                    }, 
-                    None: () => failedChapter.Add(chapter));
+            if (book.BookType == BookType.Novel)
+                Optional(await GetDocumentAsync(chapter.Url))
+                    .Map(document => document.QuerySelector(source.ChapterContentSelector)?.TextContent)
+                    .BiIter(
+                        Some: content =>
+                        {
+                            chapter.Content = content;
+                            chapter.WordCount = content?.Split(" ").Length ?? 0;
+                        },
+                        None: () => failedChapter.Add(chapter));
+            else
+                Optional(await GetDocumentAsync(chapter.Url))
+                    .Map(document => document.QuerySelectorAll(source.ChapterContentSelector)
+                        .Select(item => item.Attributes.GetNamedItem("href")?.Value))
+                    .BiIter(
+                        Some: urls =>
+                        {
+                            chapter.Content = urls.Serialize();
+                            chapter.WordCount = urls.Count();
+                        },
+                        None: () => failedChapter.Add(chapter));
         });
         
         failedChapter.IfAction(!failedChapter.IsEmpty, _ => $"Failed: {failedChapter.Count}".WriteLine());

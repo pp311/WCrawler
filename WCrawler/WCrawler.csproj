@@ -13,6 +13,7 @@
       <PackageReference Include="LanguageExt.Core" Version="4.4.9" />
       <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
       <PackageReference Include="Spectre.Console" Version="0.49.2-preview.0.10" />
+      <PackageReference Include="Spectre.Console.Json" Version="0.49.1" />
     </ItemGroup>
 
     <ItemGroup>
@@ -53,6 +54,9 @@
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
       <None Update="Templates\toc.ncx">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Sources\nettruyenaa.com.json">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
     </ItemGroup>

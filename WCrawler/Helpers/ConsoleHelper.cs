@@ -3,6 +3,7 @@ using Spectre.Console;
 using LanguageExt;
 using LanguageExt.Common;
 using Spectre.Console.Rendering;
+using Spectre.Console.Json;
 using static LanguageExt.Prelude;
 
 namespace WCrawler.Helpers;
@@ -26,6 +27,38 @@ public static class ConsoleHelper
                 .AddChoices(Enum.GetValues<SourceType>())
         ));
     
+    public static Aff<Unit> PrintViewSourceLayout(Source source)
+        => CrawlHelper.GetBookAsync(source)
+            .Map(book => {
+                if (book.Chapters.Count > 0 && book.BookType == BookType.Novel && book.Chapters[0].Content?.Length > 250)
+                {
+                    book.Chapters[0].Content = book.Chapters[0].Content?.Substring(0, 250);
+                    book.Chapters.RemoveAll(c => c != book.Chapters[0]);
+                }
+
+                var layout = new Layout("Root")
+                    .SplitColumns(
+                        new Layout("Left")
+                            .Update(
+                                new Panel(new JsonText(source.Serialize()))
+                                    .Collapse()
+                                    .Header("Source")
+                                    .RoundedBorder()
+                                    .BorderColor(Color.Yellow)
+                            ),
+                        new Layout("Right")
+                            .Update(
+                                new Panel(new JsonText(book.Serialize()))
+                                    .Collapse()
+                                    .Header("Demo book content")
+                                    .RoundedBorder()
+                                    .BorderColor(Color.Yellow)
+                            ));
+
+            AnsiConsole.Write(layout);
+            return Unit.Default;
+        });
+
     public static Eff<(SourceType SourceType, string Url)> PromptCrawlUrl(SourceType sourceType)
         => Eff(() => AnsiConsole.Ask<string>($"Enter the URL of {sourceType.ToValue()}:"))
             .Map(url =>

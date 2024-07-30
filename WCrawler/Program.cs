@@ -2,6 +2,7 @@
 using WCrawler.Helpers;
 using Spectre.Console;
 using LanguageExt;
+using WCrawler.Extensions;
 using static LanguageExt.Prelude;
 
 #region InitSource
@@ -43,7 +44,10 @@ AnsiConsole.Write(new FigletText("Whitemage").Centered().Color(Color.Red));
                 .Bind(book => JsonAff.WriteToJsonFile($"{AppSetting.CrawlResultDir}/{book.Title}.json", book))
                 .Iter(_ => ConsoleHelper.WriteLine("Success", Color.Green))
                 .RunUnit(),
-            MainMenuAction.EditSource => ConsoleHelper.PromptCrawlResult().ToAff().RunUnit(),
+            MainMenuAction.TestSource => ConsoleHelper.GetCrawlSourceType()
+                .Bind(sourceType => JsonAff.ReadFromJsonFile<Source>($"{AppSetting.SourceDir}/{sourceType.ToValue()}.json"))
+                .Bind(ConsoleHelper.PrintViewSourceLayout)
+                .RunUnit(),
             MainMenuAction.Export => ConsoleHelper.PromptCrawlResult()
                 .Bind(fileName => JsonAff.ReadFromJsonFile<Book>($"{AppSetting.CrawlResultDir}/{fileName}.json")) 
                 .Iter(EpubHelper.CreateEpubAsync)

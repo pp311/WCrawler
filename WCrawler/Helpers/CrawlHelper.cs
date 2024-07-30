@@ -31,7 +31,8 @@ public static class CrawlHelper
                 Title = document.QuerySelector(source.TitleSelector)?.TextContent ?? string.Empty,
                 Cover = document.QuerySelector(source.CoverSelector)?.Attributes.GetNamedItem("src")?.Value,
                 AuthorName = document.QuerySelector(source.AuthorNameSelector)?.TextContent,
-                Description = document.QuerySelector(source.DescriptionSelector)?.TextContent
+                Description = document.QuerySelector(source.DescriptionSelector)?.TextContent,
+                BookType = source.BookType
             })
             .Bind(book => book.AddChaptersAsync(source).ToAff());
     
@@ -47,7 +48,9 @@ public static class CrawlHelper
             .Map(chapterElements => chapterElements
                 .Select(chapterElement => new Chapter
                 {
-                    Title = chapterElement.QuerySelector(source.ChapterTitleSelector)?.TextContent,
+                    Title = string.IsNullOrEmpty(source.ChapterTitleSelector)
+                                ? "Chương " + chapterIndex
+                                : chapterElement.QuerySelector(source.ChapterTitleSelector)?.TextContent,
                     Index = chapterIndex++,
                     Url = chapterElement.QuerySelector(source.ChapterUrlSelector)?.Attributes.GetNamedItem("href")?.Value
                 }).ToList())
@@ -84,7 +87,9 @@ public static class CrawlHelper
             .Select((chapterElement, index) =>
                 new Chapter
                 {
-                    Title = chapterElement.QuerySelector(source.ChapterTitleSelector)?.TextContent,
+                    Title = string.IsNullOrEmpty(source.ChapterTitleSelector)
+                        ? "Chương " + (index + 1)
+                        : chapterElement.QuerySelector(source.ChapterTitleSelector)?.TextContent,
                     Index = index + 1,
                     Url = source.BaseUrl + chapterElement.QuerySelector(source.ChapterUrlSelector)?.Attributes.GetNamedItem("href")?.Value
                 })

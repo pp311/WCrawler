@@ -5,6 +5,7 @@
   "titleSelector":".title",
   "coverSelector":".book > img",
   "getChapterType": 1,
+  "bookType": 1,
   "authorNameSelector":"a[itemprop=\"author\"]",
   "statusSelector":".text-success",
   "descriptionSelector":"div[itemprop=\"description\"]",

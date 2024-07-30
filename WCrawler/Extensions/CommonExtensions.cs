@@ -12,7 +12,7 @@ public static class CommonExtensions {
         return Unit.Default;
     }
     
-    public static string Serialize<T>(this T obj) {
+    public static string Serialize(this object obj) {
         return JsonConvert.SerializeObject(obj);
     }
     
